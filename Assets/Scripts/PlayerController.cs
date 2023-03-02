@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     Rigidbody _rb;
     float _h;
     float _v;
-
     void Start()
     {
         _rb = GetComponent<Rigidbody>();

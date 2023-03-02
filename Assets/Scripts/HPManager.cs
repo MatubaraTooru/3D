@@ -6,6 +6,7 @@ public class HPManager : MonoBehaviour
 {
     [SerializeField] int _maxHP = 100;
     [SerializeField] Transform[] _spawnPoints;
+    [SerializeField] GameObject _destroyEffect;
     public int CurrentHP { get; set; }
 
     // Start is called before the first frame update
@@ -20,8 +21,9 @@ public class HPManager : MonoBehaviour
         if (CurrentHP < 0)
         {
             var r = Random.Range(0, _spawnPoints.Length);
-            Instantiate(this.gameObject, _spawnPoints[r]);
-            Destroy(this.gameObject);
+            Instantiate(_destroyEffect, gameObject.transform.position, Quaternion.identity);
+            transform.position = _spawnPoints[r].position;
+            CurrentHP = _maxHP;
         }
     }
 }
