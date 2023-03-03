@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShotgunController : WeaponControllerBase
@@ -6,7 +7,7 @@ public class ShotgunController : WeaponControllerBase
     float _rateTimer = 0;
     int _currentAmmo = 0;
     Transform _hitTarget;
-    bool _active = false;
+    Coroutine _coroutin = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,13 +20,18 @@ public class ShotgunController : WeaponControllerBase
     {
         _rateTimer += Time.deltaTime;
 
+        if (_coroutin != null && Input.GetButtonDown("Fire1"))
+        {
+            StopCoroutine(_coroutin);
+        }
         if (Input.GetButtonDown("Fire1") && _rateTimer > _firerate && _currentAmmo > 0)
         {
             Fire();
         }
         else if (Input.GetButtonDown("Fire1") && _currentAmmo <= 0)
         {
-
+            _audioSource.clip = _emptySound;
+            _audioSource.Play();
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
@@ -34,6 +40,9 @@ public class ShotgunController : WeaponControllerBase
     }
     protected override void Fire()
     {
+        _audioSource.clip = _fireSound;
+        _audioSource.volume = 1;
+        _audioSource.Play();
         Ray ray = Camera.main.ScreenPointToRay(_crosshair.rectTransform.position);
 
         if (Physics.Raycast(ray, out RaycastHit hit, _range, _hitLayer))
@@ -44,20 +53,8 @@ public class ShotgunController : WeaponControllerBase
         {
             var dis = Vector3.Distance(gameObject.transform.position, _hitTarget.transform.position);
             var enemyHP = _hitTarget.GetComponent<HPManager>();
-
-            if (dis < 10)
-            {
-                enemyHP.CurrentHP -= 65;
-            }
-            else if (dis < 20)
-            {
-                enemyHP.CurrentHP -= 45;
-            }
-            else
-            {
-                enemyHP.CurrentHP -= 20;
-            }
-            Debug.Log(enemyHP);
+            var d = dis / _range * 100;
+            enemyHP.CurrentHP -= _maxdamage - (int)d;
         }
         if (_currentAmmo < 1)
         {
@@ -73,19 +70,19 @@ public class ShotgunController : WeaponControllerBase
     }
     protected override void Reload()
     {
-        _active = true;
-        StartCoroutine(ReloadRoutine());
+        _audioSource.clip = _reloadSound;
+        _coroutin = StartCoroutine(ReloadRoutine());
     }
     IEnumerator ReloadRoutine()
     {
         while (_currentAmmo < _maxAmmo)
         {
+            _audioSource.Play();
+            _audioSource.volume = 0.2f;
             _currentAmmo++;
             _ammoText.text = _currentAmmo.ToString();
 
             yield return new WaitForSeconds(_reloadSpeed);
         }
-
-        _active = false;
     }
 }
