@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //gameObject.transform.forward = Camera.main.transform.forward;
         _h = Input.GetAxisRaw("Horizontal");
         _v = Input.GetAxisRaw("Vertical");
     }

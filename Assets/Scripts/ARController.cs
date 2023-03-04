@@ -15,10 +15,6 @@ public class ARController : WeaponControllerBase
     {
         
     }
-    protected override void Fire()
-    {
-        
-    }
     protected override void Reload()
     {
         
